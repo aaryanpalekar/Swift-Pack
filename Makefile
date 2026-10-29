@@ -2,12 +2,17 @@ CC ?= cc
 CFLAGS ?= -std=c11 -O2 -Wall -Wextra -Wpedantic
 CPPFLAGS ?= -Iinclude
 
-.PHONY: all clean
-all: build/swiftpack
+.PHONY: all test clean
+all: swiftpack.exe
 
-build/swiftpack: src/main.c src/swiftpack.c include/swiftpack.h
-	mkdir -p build
+test: test_swiftpack.exe
+	./test_swiftpack.exe
+
+swiftpack.exe: src/main.c src/swiftpack.c include/swiftpack.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) src/main.c src/swiftpack.c -o $@
 
+test_swiftpack.exe: tests/test_swiftpack.c src/swiftpack.c include/swiftpack.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) tests/test_swiftpack.c src/swiftpack.c -o $@
+
 clean:
-	rm -rf build
+	$(RM) swiftpack.exe test_swiftpack.exe
