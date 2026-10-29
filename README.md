@@ -14,9 +14,9 @@ The project aims to investigate the trade-offs between compression speed, decomp
 - [x] Hash-based match finding
 - [x] Command-line interface (CLI)
 - [x] Round-trip correctness tests
-- [ ] Fuzz testing
+- [x] Deterministic fuzz smoke test (10,000 inputs)
 - [x] Basic malformed-input validation
-- [ ] SIMD-based optimizations
+- [x] SSE2 match comparison with a portable scalar fallback
 - [ ] Multithreaded block compression
 - [ ] Checksums for data integrity
 - [ ] Performance benchmarks against LZ4
@@ -60,6 +60,7 @@ Build with a C11 compiler and Make:
 ```sh
 make
 make test
+make fuzz
 ./swiftpack.exe -c input.bin input.swp
 ./swiftpack.exe -d input.swp restored.bin
 ```
