@@ -10,9 +10,9 @@ The project aims to investigate the trade-offs between compression speed, decomp
 
 ## Features
 
-- [ ] Lossless compression and decompression
-- [ ] Hash-based match finding
-- [ ] Command-line interface (CLI)
+- [x] Lossless compression and decompression (initial format)
+- [x] Hash-based match finding
+- [x] Command-line interface (CLI)
 - [ ] Round-trip correctness tests
 - [ ] Fuzz testing and malformed-input validation
 - [ ] SIMD-based optimizations
@@ -49,3 +49,15 @@ SwiftPack/
 ├── Makefile
 ├── README.md
 └── LICENSE
+
+## Build and use
+
+Build with a C11 compiler and Make:
+
+```sh
+make
+build/swiftpack -c input.bin input.swp
+build/swiftpack -d input.swp restored.bin
+```
+
+The `-c` operation compresses a file; `-d` decompresses it. SwiftPack streams begin with `SWPK`, a format version, and the original size, followed by literal runs and length/offset matches. This initial project format is not compatible with LZ4 files.
