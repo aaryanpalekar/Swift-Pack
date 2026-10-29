@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(__SSE2__)
+#include <emmintrin.h>
+#endif
 
 #define HEADER_SIZE 12u
 #define HASH_SIZE 65536u
@@ -39,6 +42,26 @@ static unsigned hash3(const unsigned char *p) {
     return (unsigned)((v * 2654435761u) >> 16);
 }
 
+/* Compare match candidates 16 bytes at a time when the target supports SSE2. */
+static size_t match_length(const unsigned char *a, const unsigned char *b,
+                           size_t limit) {
+    size_t n = 0;
+#if defined(__SSE2__)
+    while (limit - n >= 16) {
+        __m128i va = _mm_loadu_si128((const __m128i *)(const void *)(a + n));
+        __m128i vb = _mm_loadu_si128((const __m128i *)(const void *)(b + n));
+        unsigned mask = (unsigned)_mm_movemask_epi8(_mm_cmpeq_epi8(va, vb));
+        if (mask != 0xffffu) {
+            for (size_t k = 0; k < 16; ++k)
+                if (!(mask & (1u << k))) return n + k;
+        }
+        n += 16;
+    }
+#endif
+    while (n < limit && a[n] == b[n]) ++n;
+    return n;
+}
+
 static int emit_literals(Buffer *b, const unsigned char *p, size_t n) {
     while (n) {
         size_t part = n > 128 ? 128 : n;
@@ -73,7 +96,9 @@ int swiftpack_compress(const unsigned char *in, size_t n,
         table[h] = (int32_t)i;
         if (prior >= 0 && i - (size_t)prior <= MAX_OFFSET) {
             offset = i - (size_t)prior;
-            while (match < MAX_MATCH && i + match < n && in[(size_t)prior + match] == in[i + match]) ++match;
+            size_t limit = n - i;
+            if (limit > MAX_MATCH) limit = MAX_MATCH;
+            match = match_length(in + (size_t)prior, in + i, limit);
         }
         if (match >= MIN_MATCH) {
             if (!emit_literals(&b, in + literal, i - literal) ||
