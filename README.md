@@ -13,8 +13,9 @@ The project aims to investigate the trade-offs between compression speed, decomp
 - [x] Lossless compression and decompression (initial format)
 - [x] Hash-based match finding
 - [x] Command-line interface (CLI)
-- [ ] Round-trip correctness tests
-- [ ] Fuzz testing and malformed-input validation
+- [x] Round-trip correctness tests
+- [ ] Fuzz testing
+- [x] Basic malformed-input validation
 - [ ] SIMD-based optimizations
 - [ ] Multithreaded block compression
 - [ ] Checksums for data integrity
