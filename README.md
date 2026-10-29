@@ -50,14 +50,17 @@ SwiftPack/
 ├── README.md
 └── LICENSE
 
+```
+
 ## Build and use
 
 Build with a C11 compiler and Make:
 
 ```sh
 make
-build/swiftpack -c input.bin input.swp
-build/swiftpack -d input.swp restored.bin
+make test
+./swiftpack.exe -c input.bin input.swp
+./swiftpack.exe -d input.swp restored.bin
 ```
 
 The `-c` operation compresses a file; `-d` decompresses it. SwiftPack streams begin with `SWPK`, a format version, and the original size, followed by literal runs and length/offset matches. This initial project format is not compatible with LZ4 files.
